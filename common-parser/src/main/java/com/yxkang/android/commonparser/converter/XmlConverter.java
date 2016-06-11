@@ -1,9 +1,11 @@
 package com.yxkang.android.commonparser.converter;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.yxkang.android.commonparser.Converter;
 import com.yxkang.android.commonparser.Reader;
+import com.yxkang.android.commonparser.exc.XmlParseException;
 import com.yxkang.android.commonparser.util.ParserUtils;
 import com.yxkang.android.commonparser.util.XmlUtils;
 
@@ -67,6 +69,9 @@ public class XmlConverter implements Converter {
             public List<?> getListObjects(String listName, String itemName, Class<?> subType) throws Exception {
                 Element childElement = XmlUtils.getChildElement(element, listName);
                 if (childElement != null) {
+                    if (TextUtils.isEmpty(itemName)) {
+                        throw new XmlParseException("lack of itemName, listName = " + listName);
+                    }
                     List<Element> elements = XmlUtils.getChildElements(element, itemName);
                     if (elements != null) {
                         List<Object> list = new ArrayList<>();
