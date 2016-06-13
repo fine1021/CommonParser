@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * Created by yexiaokang on 2016/6/7.
- * 类型转换工具类
+ * <p>converter utils</p>
  */
 public final class Converters {
 
@@ -38,13 +38,13 @@ public final class Converters {
 
             for (PropertyDescriptor descriptor : descriptors) {
                 Method writeMethod = descriptor.getWriteMethod();
-                // 忽略只读的函数
+                // ignore read-only method
                 if (writeMethod == null) {
                     continue;
                 }
 
                 String itemName = descriptor.getName();
-                Field field = clazz.getDeclaredField(itemName);      // 获取声明的字段，包括private字段
+                Field field = clazz.getDeclaredField(itemName);      // get the declared field, include private field
 
                 MapFieldMethod fieldMethod = new MapFieldMethod();
                 fieldMethod.setField(field);
@@ -67,7 +67,7 @@ public final class Converters {
                 if (msgField != null) {
                     itemName = msgField.value();
 
-                    // 该字段的MsgField注释未设置值，默认取字段名
+                    // if the MsgField annotation value is empty, set the field name as the default value
                     if (TextUtils.isEmpty(itemName)) {
                         itemName = field.getName();
                     }
@@ -77,13 +77,13 @@ public final class Converters {
                 if (msgListField != null) {
                     listName = msgListField.value();
 
-                    // 该字段的MsgListField注释未设置值，默认取字段名
+                    // if the MsgListField annotation value is empty, set the field name as the default value
                     if (TextUtils.isEmpty(listName)) {
                         listName = field.getName();
                     }
                 }
 
-                // 过滤掉未注释的字段和字符串中不包含的字段
+                // filter the unannotated field and excluded field
                 if (TextUtils.isEmpty(itemName) || !reader.contain(itemName)) {
                     if (TextUtils.isEmpty(listName) || !reader.contain(listName)) {
                         continue;

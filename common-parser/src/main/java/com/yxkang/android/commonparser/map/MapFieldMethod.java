@@ -9,12 +9,12 @@ import java.lang.reflect.Method;
 public class MapFieldMethod {
 
     /**
-     * 属性
+     * reflect field
      */
     private Field mField;
 
     /**
-     * 方法
+     * reflect method
      */
     private Method mMethod;
 

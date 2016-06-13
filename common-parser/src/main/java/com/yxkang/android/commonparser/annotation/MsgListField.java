@@ -12,8 +12,11 @@ import java.lang.annotation.Target;
 @Target(value = {ElementType.FIELD})
 public @interface MsgListField {
 
+
     /**
-     * 属性列表映射名称
+     * set the list map name, default is a empty string
+     *
+     * @return list map name
      */
     String value() default "";
 }

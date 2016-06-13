@@ -6,12 +6,12 @@ package com.yxkang.android.commonparser;
 public interface Converter {
 
     /**
-     * 把字符串的值解析到对应的类实体中
+     * convert the text to the class entity
      *
-     * @param clazz 指定的实体类的类型
-     * @param text  字符串
-     * @param <T>   泛型类
-     * @return 解析的实体类
+     * @param clazz the entity class
+     * @param text  text
+     * @param <T>   class type
+     * @return the result entity
      */
     <T> T convert(Class<T> clazz, String text);
 }

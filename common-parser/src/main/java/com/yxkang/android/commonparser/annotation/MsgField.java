@@ -7,14 +7,15 @@ import java.lang.annotation.Target;
 
 /**
  * Created by yexiaokang on 2016/6/6.
- * 数据结构字段注释
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {ElementType.FIELD})
 public @interface MsgField {
 
     /**
-     * 属性映射名称
+     * set the field map name, default is a empty string
+     *
+     * @return field map name
      */
     String value() default "";
 }

@@ -74,7 +74,7 @@ public class JsonConverter implements Converter {
                                 }
                             }
                             object = jsonObj.opt(itemName);
-                        } else {             // subClazz不是基本数据类型，把它视为自定义的对象，利用递归来获取
+                        } else {             // subType is not primitive type, regard it as custom class
                             object = fromJson(subType, jsonObj);
                         }
 

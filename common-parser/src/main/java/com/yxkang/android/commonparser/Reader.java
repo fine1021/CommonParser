@@ -4,42 +4,45 @@ import java.util.List;
 
 /**
  * Created by yexiaokang on 2016/6/7.
- * 内容读取器
+ * <p>content reader</p>
  */
 public interface Reader {
 
     /**
-     * 检查是否包含指定的属性
+     * check if has the property of given name
      *
-     * @param name 映射名称
-     * @return {@code true} 如果包含，否则 {@code false}
+     * @param name map name
+     * @return {@code true} if has, otherwise {@code false}
      */
     boolean contain(String name);
 
     /**
-     * 读取单个基本对象。
+     * read a primitive type
      *
-     * @param name 映射名称
-     * @return 基本对象值
+     * @param name map name
+     * @return primitive object
      */
     Object getPrimitiveObject(String name);
 
+
     /**
-     * 读取单个自定义对象。
+     * read a custom class
      *
-     * @param name 映射名称
-     * @param type 映射类型
-     * @return 映射类型的实例
+     * @param name map name
+     * @param type map type
+     * @return class entity
+     * @throws Exception the parse exception
      */
     Object getObject(String name, Class<?> type) throws Exception;
 
     /**
-     * 读取多个对象的值。
+     * read a list of object, maybe a custom class or primitive type
      *
-     * @param listName 列表名称
-     * @param itemName 映射名称
-     * @param subType  嵌套映射类型
-     * @return 嵌套映射类型实例列表
+     * @param listName list name
+     * @param itemName the item name
+     * @param subType  sub type
+     * @return the list of the sub class entity
+     * @throws Exception the parse exception
      */
     List<?> getListObjects(String listName, String itemName, Class<?> subType) throws Exception;
 }

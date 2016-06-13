@@ -79,7 +79,7 @@ public class XmlConverter implements Converter {
                             Object object;
                             if (ParserUtils.isPrimitiveType(subType)) {
                                 object = XmlUtils.getElementValue(e);
-                            } else {
+                            } else {              // subType is not primitive type, regard it as custom class
                                 object = fromXml(subType, e);
                             }
                             if (object != null) {

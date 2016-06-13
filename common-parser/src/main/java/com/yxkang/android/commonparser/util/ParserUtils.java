@@ -6,10 +6,10 @@ package com.yxkang.android.commonparser.util;
 public class ParserUtils {
 
     /**
-     * 判断给定的类是否是基本的数据类型
+     * check the given class is a primitive type
      *
-     * @param clazz 待判断类型
-     * @return 判断结果，true或false
+     * @param clazz the class
+     * @return {@code true} if this class is a primitive type, otherwise {@code false}
      */
     public static boolean isPrimitiveType(Class<?> clazz) {
         boolean result = false;

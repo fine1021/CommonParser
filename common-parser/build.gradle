@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 23
@@ -8,7 +9,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
-        versionName "1.0.0"
+        versionName "0.0.1-beta"
     }
     buildTypes {
         release {
@@ -16,10 +17,63 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        encoding = "utf-8"
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
+}
+
+ext {
+    releaseVersion = '0.0.1-beta'
+}
+
+task buildReleaseJar(dependsOn: ['compileReleaseJavaWithJavac'], type: Jar) {
+
+    // appendix = "demo"
+    baseName = "support"
+    version = project.releaseVersion
+    classifier = "release"
+
+    // 后缀名
+    extension = "jar"
+    // 最终的 Jar 包名，如果没设置，默认为 [baseName]-[appendix]-[version]-[classifier].[extension]
+    // archiveName = "support.jar"
+
+    // 需打包的资源所在的路径集
+    def srcClassDir = [project.buildDir.absolutePath + "/intermediates/classes/release"];
+    // 初始化资源路径集
+    from srcClassDir
+
+    // 去除路径集下部分的资源
+    exclude "com/yxkang/android/commonparser/BuildConfig.class"
+    exclude "**/R.class"
+    exclude "**/R\$*.class"
+
+    // 只导入资源路径集下的部分资源
+    include "com/yxkang/android/commonparser/**/*.class"
+
+    // 注: exclude include 支持可变长参数
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+publish {
+    userOrg = 'fine1021'
+    repoName = 'maven'
+    groupId = 'com.yxkang.android'
+    artifactId = 'common-parser'
+    publishVersion = project.releaseVersion
+    description = 'a common parser for android'
+    website = 'https://github.com/fine1021/CommonParser'
+    issueTracker = "${website}/issues"
+    repository = "${website}.git"
+    bintrayUser = properties.getProperty("bintray.user")
+    bintrayKey = properties.getProperty("bintray.apikey")
+    dryRun = false
 }
