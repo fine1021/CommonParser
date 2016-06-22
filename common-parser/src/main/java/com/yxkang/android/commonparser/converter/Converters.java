@@ -1,15 +1,16 @@
 package com.yxkang.android.commonparser.converter;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.yxkang.android.commonparser.Reader;
-import com.yxkang.android.commonparser.annotation.MsgField;
+import com.yxkang.android.commonparser.annotation.MsgItemField;
 import com.yxkang.android.commonparser.annotation.MsgListField;
 import com.yxkang.android.commonparser.map.MapFieldMethod;
 import com.yxkang.android.commonparser.map.PropertyDescriptor;
 import com.yxkang.android.commonparser.map.PropertyDescriptorHelper;
+import com.yxkang.android.commonparser.trace.Logger;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -23,18 +24,36 @@ import java.util.List;
  */
 public final class Converters {
 
-    private static final String TAG = "Converters";
-
-    public static <T> T convert(Class<T> clazz, Reader reader) {
+    /**
+     * convert the content of the reader to the clazz entry
+     *
+     * @param clazz  clazz
+     * @param reader content reader
+     * @param logger logger to trace
+     * @param <T>    data model
+     * @return the given clazz entry
+     */
+    public static <T> T convert(Class<T> clazz, Reader reader, Logger logger) {
         T rsp = null;
 
         try {
-            rsp = clazz.newInstance();
+            if (clazz.getName().contains("$")) {
+                String className = clazz.getName();
+                String outerClass = className.substring(0, className.lastIndexOf("$"));
+                logger.info("convert: outerClass = %s", outerClass);
+                Class<?> cls = Class.forName(outerClass);
+                Object o = cls.newInstance();
+                Constructor<T> constructor = clazz.getDeclaredConstructor(cls);
+                constructor.setAccessible(true);
+                rsp = constructor.newInstance(o);
+            } else {
+                rsp = clazz.newInstance();
+            }
 
             List<PropertyDescriptor> descriptors = PropertyDescriptorHelper.getPropertyDescriptors(clazz);
             List<MapFieldMethod> fieldMethods = new ArrayList<>();
 
-            Log.i(TAG, "convert: descriptors size = " + descriptors.size());
+            logger.info("convert: descriptors size = %d", descriptors.size());
 
             for (PropertyDescriptor descriptor : descriptors) {
                 Method writeMethod = descriptor.getWriteMethod();
@@ -53,7 +72,7 @@ public final class Converters {
                 fieldMethods.add(fieldMethod);
             }
 
-            Log.i(TAG, "convert: fieldMethods size = " + fieldMethods.size());
+            logger.info("convert: fieldMethods size = %d", fieldMethods.size());
 
             for (MapFieldMethod fieldMethod : fieldMethods) {
 
@@ -63,11 +82,11 @@ public final class Converters {
                 Field field = fieldMethod.getField();
                 Method method = fieldMethod.getMethod();
 
-                MsgField msgField = field.getAnnotation(MsgField.class);
-                if (msgField != null) {
-                    itemName = msgField.value();
+                MsgItemField msgItemField = field.getAnnotation(MsgItemField.class);
+                if (msgItemField != null) {
+                    itemName = msgItemField.value();
 
-                    // if the MsgField annotation value is empty, set the field name as the default value
+                    // if the MsgItemField annotation value is empty, set the field name as the default value
                     if (TextUtils.isEmpty(itemName)) {
                         itemName = field.getName();
                     }
@@ -137,6 +156,7 @@ public final class Converters {
                         if (genericTypes != null && genericTypes.length > 0) {
                             if (genericTypes[0] instanceof Class<?>) {
                                 Class<?> subType = (Class<?>) genericTypes[0];
+                                logger.info("convert: subType = %s", subType.getName());
                                 List<?> objects = reader.getListObjects(listName, itemName, subType);
                                 if (objects != null) {
                                     method.invoke(rsp, objects);
@@ -177,9 +197,9 @@ public final class Converters {
                 }
 
             }
-            Log.i(TAG, "convert: success");
+            logger.info("convert: success");
         } catch (Exception e) {
-            Log.e(TAG, "convert: Exception", e);
+            logger.error("convert: Exception", e);
         }
         return rsp;
     }

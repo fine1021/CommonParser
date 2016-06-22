@@ -9,7 +9,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
-        versionName "0.0.1-beta"
+        versionName "1.0.0"
     }
     buildTypes {
         release {
@@ -28,13 +28,13 @@ dependencies {
 }
 
 ext {
-    releaseVersion = '0.0.1-beta'
+    releaseVersion = '1.0.0'
 }
 
 task buildReleaseJar(dependsOn: ['compileReleaseJavaWithJavac'], type: Jar) {
 
     // appendix = "demo"
-    baseName = "support"
+    baseName = "common-parser"
     version = project.releaseVersion
     classifier = "release"
 

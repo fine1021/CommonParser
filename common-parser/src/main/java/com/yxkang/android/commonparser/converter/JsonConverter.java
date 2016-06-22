@@ -1,11 +1,12 @@
 package com.yxkang.android.commonparser.converter;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.yxkang.android.commonparser.Converter;
 import com.yxkang.android.commonparser.Reader;
 import com.yxkang.android.commonparser.exc.JsonParseException;
+import com.yxkang.android.commonparser.trace.Logger;
+import com.yxkang.android.commonparser.util.ParserLogger;
 import com.yxkang.android.commonparser.util.ParserUtils;
 
 import org.json.JSONArray;
@@ -20,7 +21,11 @@ import java.util.List;
  */
 public class JsonConverter implements Converter {
 
-    private static final String TAG = "JsonConverter";
+    private Logger logger;
+
+    public JsonConverter() {
+        logger = new ParserLogger();
+    }
 
     @Override
     public <T> T convert(Class<T> clazz, String text) {
@@ -28,7 +33,7 @@ public class JsonConverter implements Converter {
             JSONObject jsonObject = new JSONObject(text);
             return fromJson(clazz, jsonObject);
         } catch (JSONException e) {
-            Log.e(TAG, "convert: JSONException", e);
+            logger.error("convert JSONException", e);
             return null;
         }
     }
@@ -38,16 +43,19 @@ public class JsonConverter implements Converter {
 
             @Override
             public boolean contain(String name) {
+                logger.debug("contain: name = %s", name);
                 return jsonObject.has(name);
             }
 
             @Override
             public Object getPrimitiveObject(String name) {
+                logger.debug("getPrimitiveObject: name = %s", name);
                 return jsonObject.opt(name);
             }
 
             @Override
             public Object getObject(String name, Class<?> type) throws Exception {
+                logger.debug("getObject: name = %s", name);
                 JSONObject jsonObj = jsonObject.optJSONObject(name);
                 if (jsonObj != null) {
                     return fromJson(type, jsonObj);
@@ -57,9 +65,11 @@ public class JsonConverter implements Converter {
 
             @Override
             public List<?> getListObjects(String listName, String itemName, Class<?> subType) throws Exception {
+                logger.debug("getObject: listName = %s, itemName = %s", listName, itemName);
                 JSONArray jsonArray = jsonObject.optJSONArray(listName);
                 if (jsonArray != null) {
                     int length = jsonArray.length();
+                    logger.info("getListObjects: array length = %d", length);
                     List<Object> list = new ArrayList<>();
                     for (int i = 0; i < length; i++) {
                         JSONObject jsonObj = jsonArray.getJSONObject(i);
@@ -105,6 +115,11 @@ public class JsonConverter implements Converter {
                 }
                 return null;
             }
-        });
+        }, logger);
+    }
+
+    @Override
+    public void setLogger(Logger logger) {
+        this.logger = logger;
     }
 }
