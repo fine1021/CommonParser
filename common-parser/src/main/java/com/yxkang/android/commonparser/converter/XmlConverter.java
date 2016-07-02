@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,7 +102,19 @@ public class XmlConverter implements Converter {
                         if (ParserUtils.isPrimitiveType(subType)) {
                             object = XmlUtils.getElementValue(e);
                         } else {              // subType is not primitive type, regard it as custom class
-                            object = fromXml(subType, e);
+                            int childElementCount = XmlUtils.getChildElementCount(e);
+                            int annotationFieldCount = ParserUtils.getAnnotationFieldCount(subType);
+                            logger.info("getListObjects: childElementCount = %d, annotationFieldCount = %d",
+                                    childElementCount, annotationFieldCount);
+                            if (childElementCount == 1 && annotationFieldCount == 0) {
+                                logger.debug("the custom class has only one child element node and no annotation field, " +
+                                        "use the constructor with one String parameter type to instance an object");
+                                Constructor constructor = subType.getConstructor(String.class);
+                                constructor.setAccessible(true);
+                                object = constructor.newInstance(XmlUtils.getChildElementValue(e));
+                            } else {
+                                object = fromXml(subType, e);
+                            }
                         }
                         if (object != null) {
                             if (String.class.isAssignableFrom(subType)) {

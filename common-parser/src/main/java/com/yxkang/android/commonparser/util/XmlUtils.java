@@ -98,4 +98,51 @@ public class XmlUtils {
 
         return null;
     }
+
+    /**
+     * Get the count of the child element under the given parent element.
+     *
+     * @param parent the parent element
+     * @return the child element count, 0 if not exists child element
+     */
+    public static int getChildElementCount(Element parent) {
+        int count = 0;
+        if (parent != null) {
+            NodeList list = parent.getChildNodes();
+            if (list != null && list.getLength() > 0) {
+                int length = list.getLength();
+                for (int i = 0; i < length; i++) {
+                    Node node = list.item(i);
+                    if (node instanceof Element) {
+                        count++;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Get the text value of the child element under the given parent
+     * element. If there is more than one child element, return the value of the
+     * first one.
+     *
+     * @param parent the parent element
+     * @return value of the first child element, null if not exists child element
+     */
+    public static String getChildElementValue(Element parent) {
+        if (parent != null) {
+            NodeList list = parent.getChildNodes();
+            if (list != null && list.getLength() > 0) {
+                int length = list.getLength();
+                for (int i = 0; i < length; i++) {
+                    Node node = list.item(i);
+                    if (node instanceof Element) {
+                        return getElementValue((Element) node);
+                    }
+                }
+            }
+        }
+        return null;
+    }
 }

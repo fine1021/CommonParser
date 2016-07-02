@@ -6,6 +6,7 @@ import com.yxkang.android.commonparser.Converter;
 import com.yxkang.android.commonparser.Reader;
 import com.yxkang.android.commonparser.exc.JsonParseException;
 import com.yxkang.android.commonparser.trace.Logger;
+import com.yxkang.android.commonparser.util.JsonUtils;
 import com.yxkang.android.commonparser.util.ParserLogger;
 import com.yxkang.android.commonparser.util.ParserUtils;
 
@@ -13,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +87,18 @@ public class JsonConverter implements Converter {
                             }
                             object = jsonObj.opt(itemName);
                         } else {             // subType is not primitive type, regard it as custom class
-                            object = fromJson(subType, jsonObj);
+                            int annotationFieldCount = ParserUtils.getAnnotationFieldCount(subType);
+                            logger.info("getListObjects: json mappings sizes = %d, annotationFieldCount = %d",
+                                    jsonObjLength, annotationFieldCount);
+                            if (jsonObjLength == 1 && annotationFieldCount == 0) {
+                                logger.debug("the custom class has only one mappings value and no annotation field, " +
+                                        "use the constructor with one String parameter type to instance an object");
+                                Constructor constructor = subType.getConstructor(String.class);
+                                constructor.setAccessible(true);
+                                object = constructor.newInstance(JsonUtils.getJsonValue(jsonObj));
+                            } else {
+                                object = fromJson(subType, jsonObj);
+                            }
                         }
 
                         if (object != null) {

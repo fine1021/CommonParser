@@ -33,10 +33,13 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 Converter converter = new XmlConverter();
                 converter.setLogger(new XmlParserLogger());
-                UserResponse userResponse = converter.convert(UserResponse.class, XmlConstant.DATA);
+                UserResponse userResponse = converter.convert(UserResponse.class, XmlConstant.DATA2);
                 if (userResponse != null) {
                     Log.i(TAG, "xml: " + userResponse.toString());
                 }
+
+                ListSize listSize = converter.convert(ListSize.class, XmlConstant.DATA3);
+                Log.i(TAG, "xml: " + listSize.toString());
             }
         });
     }

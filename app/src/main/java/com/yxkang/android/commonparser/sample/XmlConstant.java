@@ -74,4 +74,23 @@ public class XmlConstant {
             "        <sex>Male</sex>\n" +
             "    </user>\n" +
             "</root>";
+
+    public static String DATA3 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<picture-size>\n" +
+            "        <data>\n" +
+            "            <resolution>640*480</resolution>\n" +
+            "        </data>\n" +
+            "        <data>\n" +
+            "            <resolution>1280*720</resolution>\n" +
+            "        </data>\n" +
+            "        <data>\n" +
+            "            <resolution>1280*960</resolution>\n" +
+            "        </data>\n" +
+            "        <data>\n" +
+            "            <resolution>1920*1080</resolution>\n" +
+            "        </data>\n" +
+            "        <data>\n" +
+            "            <resolution>2048*1536</resolution>\n" +
+            "        </data>\n" +
+            "    </picture-size>";
 }
