@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by fine on 2016/6/11.
  */
-public class XmlUtils {
+public class DomUtils {
 
     /**
      * Gets the immediately child elements list from the parent element.

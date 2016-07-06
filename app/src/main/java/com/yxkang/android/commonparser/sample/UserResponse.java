@@ -17,6 +17,9 @@ public class UserResponse {
     @MsgItemField(value = "user")
     private List<User> list;
 
+    @MsgItemField(value = "data")
+    private Size size;
+
     public UserResponse() {
     }
 
@@ -36,21 +39,20 @@ public class UserResponse {
         this.list = list;
     }
 
+    public Size getSize() {
+        return size;
+    }
+
+    public void setSize(Size size) {
+        this.size = size;
+    }
+
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        if (users != null) {
-            for (User user : users) {
-                builder.append(user.toString());
-            }
-        }
-        if (list != null) {
-            for (User user : list) {
-                builder.append(user.toString());
-            }
-        }
-        return "UserResponse {" +
-                "users=" + builder.toString() +
+        return "UserResponse{" +
+                "users=" + users +
+                ", list=" + list +
+                ", size=" + size +
                 '}';
     }
 

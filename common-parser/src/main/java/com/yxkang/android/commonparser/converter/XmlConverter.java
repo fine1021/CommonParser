@@ -6,9 +6,9 @@ import com.yxkang.android.commonparser.Converter;
 import com.yxkang.android.commonparser.Reader;
 import com.yxkang.android.commonparser.exc.XmlParseException;
 import com.yxkang.android.commonparser.trace.Logger;
+import com.yxkang.android.commonparser.util.DomUtils;
 import com.yxkang.android.commonparser.util.ParserLogger;
 import com.yxkang.android.commonparser.util.ParserUtils;
-import com.yxkang.android.commonparser.util.XmlUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -23,6 +23,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * Created by fine on 2016/6/11.
+ * <p>this converter is the default xml converter, implemented by <code>Dom</code></p>
  */
 public class XmlConverter implements Converter {
 
@@ -54,22 +55,36 @@ public class XmlConverter implements Converter {
             @Override
             public boolean contain(String name) {
                 logger.debug("contain: name = %s", name);
-                List<Element> elements = XmlUtils.getChildElements(element, name);
+                List<Element> elements = DomUtils.getChildElements(element, name);
                 return elements != null;
             }
 
             @Override
             public Object getPrimitiveObject(String name) {
                 logger.debug("getPrimitiveObject: name = %s", name);
-                return XmlUtils.getElementValue(element, name);
+                return DomUtils.getElementValue(element, name);
             }
 
             @Override
             public Object getObject(String name, Class<?> type) throws Exception {
                 logger.debug("getObject: name = %s", name);
-                Element childElement = XmlUtils.getChildElement(element, name);
+                Element childElement = DomUtils.getChildElement(element, name);
                 if (childElement != null) {
-                    return fromXml(type, childElement);
+                    Object object;
+                    int childElementCount = DomUtils.getChildElementCount(childElement);
+                    int annotationFieldCount = ParserUtils.getAnnotationFieldCount(type);
+                    logger.info("getObject: childElementCount = %d, annotationFieldCount = %d",
+                            childElementCount, annotationFieldCount);
+                    if (childElementCount == 1 && annotationFieldCount == 0) {
+                        logger.debug("the custom class has only one child element node and no annotation field, " +
+                                "use the constructor with one String parameter type to instance an object");
+                        Constructor constructor = type.getConstructor(String.class);
+                        constructor.setAccessible(true);
+                        object = constructor.newInstance(DomUtils.getChildElementValue(childElement));
+                    } else {
+                        object = fromXml(type, childElement);
+                    }
+                    return object;
                 }
                 return null;
             }
@@ -79,7 +94,7 @@ public class XmlConverter implements Converter {
                 logger.debug("getObject: listName = %s, itemName = %s", listName, itemName);
                 List<Element> elements;
                 if (!TextUtils.isEmpty(listName)) {
-                    Element childElement = XmlUtils.getChildElement(element, listName);
+                    Element childElement = DomUtils.getChildElement(element, listName);
                     if (childElement == null) {
                         logger.error("the listName has no childElement, listName = %s", listName);
                         return null;
@@ -87,11 +102,11 @@ public class XmlConverter implements Converter {
                         if (TextUtils.isEmpty(itemName)) {
                             throw new XmlParseException("lack of itemName, listName = " + listName);
                         }
-                        elements = XmlUtils.getChildElements(childElement, itemName);
+                        elements = DomUtils.getChildElements(childElement, itemName);
                     }
                 } else {
                     logger.debug("the listName is empty, use the itemName to get elements");
-                    elements = XmlUtils.getChildElements(element, itemName);
+                    elements = DomUtils.getChildElements(element, itemName);
                 }
                 if (elements != null) {
                     logger.info("getListObjects: elements size = %d", elements.size());
@@ -100,9 +115,9 @@ public class XmlConverter implements Converter {
                         logger.debug("getListObjects: element name = %s ", e.getNodeName());
                         Object object;
                         if (ParserUtils.isPrimitiveType(subType)) {
-                            object = XmlUtils.getElementValue(e);
+                            object = DomUtils.getElementValue(e);
                         } else {              // subType is not primitive type, regard it as custom class
-                            int childElementCount = XmlUtils.getChildElementCount(e);
+                            int childElementCount = DomUtils.getChildElementCount(e);
                             int annotationFieldCount = ParserUtils.getAnnotationFieldCount(subType);
                             logger.info("getListObjects: childElementCount = %d, annotationFieldCount = %d",
                                     childElementCount, annotationFieldCount);
@@ -111,7 +126,7 @@ public class XmlConverter implements Converter {
                                         "use the constructor with one String parameter type to instance an object");
                                 Constructor constructor = subType.getConstructor(String.class);
                                 constructor.setAccessible(true);
-                                object = constructor.newInstance(XmlUtils.getChildElementValue(e));
+                                object = constructor.newInstance(DomUtils.getChildElementValue(e));
                             } else {
                                 object = fromXml(subType, e);
                             }

@@ -73,6 +73,9 @@ public class XmlConstant {
             "        <age>24</age>\n" +
             "        <sex>Male</sex>\n" +
             "    </user>\n" +
+            "        <data>\n" +
+            "            <resolution>640*480</resolution>\n" +
+            "        </data>\n" +
             "</root>";
 
     public static String DATA3 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +

@@ -3,11 +3,11 @@ apply plugin: 'com.novoda.bintray-release'
 
 def versionMajor = 1
 def versionMinor = 0
-def versionPatch = 2
+def versionPatch = 0
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '24.0.0'
+    buildToolsVersion "24.0.0"
 
     defaultConfig {
         minSdkVersion 16
@@ -21,23 +21,21 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        encoding = "utf-8"
-    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
+    compile 'org.dom4j:dom4j:2.0.0'
+    compile project(':common-parser')
 }
-
 ext {
     releaseVersion = "${versionMajor}.${versionMinor}.${versionPatch}"
 }
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    baseName = "common-parser"
+    baseName = "common-parser-dom4j"
     version = project.releaseVersion
     classifier = 'sources'
 }
@@ -50,7 +48,7 @@ task javadoc(type: Javadoc) {
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
-    baseName = "common-parser"
+    baseName = "common-parser-dom4j"
     version = project.releaseVersion
     from javadoc.destinationDir
 }
@@ -63,7 +61,7 @@ artifacts {
 task buildReleaseJar(dependsOn: ['compileReleaseJavaWithJavac'], type: Jar) {
 
     // appendix = "demo"
-    baseName = "common-parser"
+    baseName = "common-parser-dom4j"
     version = project.releaseVersion
     // classifier = "release"
 
@@ -78,12 +76,12 @@ task buildReleaseJar(dependsOn: ['compileReleaseJavaWithJavac'], type: Jar) {
     from srcClassDir
 
     // 去除路径集下部分的资源
-    exclude "com/yxkang/android/commonparser/BuildConfig.class"
+    exclude "com/yxkang/android/cp/dom4j/BuildConfig.class"
     exclude "**/R.class"
     exclude "**/R\$*.class"
 
     // 只导入资源路径集下的部分资源
-    include "com/yxkang/android/commonparser/**/*.class"
+    include "com/yxkang/android/cp/dom4j/**/*.class"
 
     // 注: exclude include 支持可变长参数
 }
@@ -95,9 +93,9 @@ publish {
     userOrg = 'fine1021'
     repoName = 'maven'
     groupId = 'com.yxkang.android'
-    artifactId = 'common-parser'
+    artifactId = 'common-parser-dom4j'
     publishVersion = project.releaseVersion
-    description = 'a common parser for android'
+    description = 'a dom4j support plugin for common parser'
     website = 'https://github.com/fine1021/CommonParser'
     issueTracker = "${website}/issues"
     repository = "${website}.git"
