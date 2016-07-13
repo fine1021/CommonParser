@@ -1,6 +1,6 @@
 package com.yxkang.android.commonparser.sample;
 
-import com.yxkang.android.commonparser.annotation.MsgItemField;
+import com.yxkang.android.commonparser.annotation.MsgListField;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class ListSize {
 
-    @MsgItemField(value = "data")
+    @MsgListField(value = "data")
     private List<Size> sizes;
 
     public ListSize() {

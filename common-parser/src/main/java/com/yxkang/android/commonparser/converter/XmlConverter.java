@@ -91,22 +91,23 @@ public class XmlConverter implements Converter {
 
             @Override
             public List<?> getListObjects(String listName, String itemName, Class<?> subType) throws Exception {
-                logger.debug("getObject: listName = %s, itemName = %s", listName, itemName);
+                logger.debug("getListObjects: listName = %s, itemName = %s", listName, itemName);
                 List<Element> elements;
                 if (!TextUtils.isEmpty(listName)) {
-                    Element childElement = DomUtils.getChildElement(element, listName);
-                    if (childElement == null) {
-                        logger.error("the listName has no childElement, listName = %s", listName);
-                        return null;
+                    if (TextUtils.isEmpty(itemName)) {
+                        logger.debug("the itemName is empty, use the listName to get elements");
+                        elements = DomUtils.getChildElements(element, listName);
                     } else {
-                        if (TextUtils.isEmpty(itemName)) {
-                            throw new XmlParseException("lack of itemName, listName = " + listName);
+                        Element childElement = DomUtils.getChildElement(element, listName);
+                        if (childElement == null) {
+                            logger.error("the listName has no childElement, listName = %s", listName);
+                            return null;
+                        } else {
+                            elements = DomUtils.getChildElements(childElement, itemName);
                         }
-                        elements = DomUtils.getChildElements(childElement, itemName);
                     }
                 } else {
-                    logger.debug("the listName is empty, use the itemName to get elements");
-                    elements = DomUtils.getChildElements(element, itemName);
+                    throw new XmlParseException("lack of listName, listName = " + listName + ", itemName = " + itemName);
                 }
                 if (elements != null) {
                     logger.info("getListObjects: elements size = %d", elements.size());

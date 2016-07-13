@@ -14,7 +14,7 @@ public class UserResponse {
     @MsgItemField(value = "user")
     private List<User> users;
 
-    @MsgItemField(value = "user")
+    @MsgListField(value = "user")
     private List<User> list;
 
     @MsgItemField(value = "data")
