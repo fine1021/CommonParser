@@ -29,7 +29,7 @@ public class ParserUtils {
     }
 
     /**
-     * get the annotation field count of current class
+     * get the annotation field count of current class and super class(if this super class is not top class)
      *
      * @param clazz the current class
      * @return the annotation field count
@@ -43,6 +43,19 @@ public class ParserUtils {
                 MsgListField msgListField = field.getAnnotation(MsgListField.class);
                 if (msgItemField != null || msgListField != null) {
                     count++;
+                }
+            }
+        }
+        Class<?> superClass = clazz.getSuperclass();
+        if (!superClass.isAssignableFrom(Object.class)) {
+            fields = superClass.getDeclaredFields();
+            if (fields != null && fields.length > 0) {
+                for (Field field : fields) {
+                    MsgItemField msgItemField = field.getAnnotation(MsgItemField.class);
+                    MsgListField msgListField = field.getAnnotation(MsgListField.class);
+                    if (msgItemField != null || msgListField != null) {
+                        count++;
+                    }
                 }
             }
         }

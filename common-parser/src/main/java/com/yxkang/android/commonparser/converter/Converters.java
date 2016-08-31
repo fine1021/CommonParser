@@ -13,6 +13,7 @@ import com.yxkang.android.commonparser.trace.Logger;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -37,12 +38,16 @@ public final class Converters {
         T rsp = null;
 
         try {
-            if (clazz.getName().contains("$")) {
+            int mod = clazz.getModifiers();
+            logger.info("convert: class mod = %d", mod);
+            if (clazz.getName().contains("$") && !Modifier.isStatic(mod)) {
                 String className = clazz.getName();
+                logger.info("convert: class = %s", className);
                 String outerClass = className.substring(0, className.lastIndexOf("$"));
                 logger.info("convert: outerClass = %s", outerClass);
                 Class<?> cls = Class.forName(outerClass);
                 Object o = cls.newInstance();
+                // get private or public constructor
                 Constructor<T> constructor = clazz.getDeclaredConstructor(cls);
                 constructor.setAccessible(true);
                 rsp = constructor.newInstance(o);
@@ -63,7 +68,25 @@ public final class Converters {
                 }
 
                 String itemName = descriptor.getName();
-                Field field = clazz.getDeclaredField(itemName);      // get the declared field, include private field
+
+                Field field = getFieldWithoutExp(clazz, itemName);
+
+                if (field == null) {       // attempt to get super class field
+                    logger.warn("convert: can't find the %s field in current class, search its super class", itemName);
+                    field = getFieldWithoutExp(clazz.getSuperclass(), itemName);
+                    String methodName = writeMethod.getName();
+                    writeMethod = getSetMethodWithoutExp(clazz.getSuperclass(), field, methodName);
+                }
+
+                if (field == null) {
+                    logger.warn("convert: the %s field is still null, throw away this field", itemName);
+                    continue;
+                }
+
+                if (writeMethod == null) {
+                    logger.warn("convert: the super class doesn't have write method, restore sub class write method");
+                    writeMethod = descriptor.getWriteMethod();
+                }
 
                 MapFieldMethod fieldMethod = new MapFieldMethod();
                 fieldMethod.setField(field);
@@ -202,5 +225,39 @@ public final class Converters {
             logger.error("convert: Exception", e);
         }
         return rsp;
+    }
+
+
+    /**
+     * get the field in the class without throwing an exception
+     *
+     * @param clazz    the class
+     * @param itemName field name
+     * @return the field or null if not found
+     */
+    private static Field getFieldWithoutExp(Class<?> clazz, String itemName) {
+        try {
+            return clazz.getDeclaredField(itemName);        // get the declared field, include private field
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * get the public method in the class without throwing an ecception
+     *
+     * @param clazz      the class
+     * @param field      the parameter field
+     * @param methodName the method name
+     * @param <T>        class model
+     * @return the method or null if not found
+     */
+    private static <T> Method getSetMethodWithoutExp(Class<T> clazz, Field field, String methodName) {
+        try {
+            return clazz.getDeclaredMethod(methodName, field.getType());
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 }

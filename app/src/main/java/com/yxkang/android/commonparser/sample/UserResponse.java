@@ -56,7 +56,7 @@ public class UserResponse {
                 '}';
     }
 
-    public class User {
+    public static class User {
 
         @MsgItemField
         private String name;

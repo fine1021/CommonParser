@@ -120,17 +120,23 @@ public class ParserLogger implements Logger {
 
     @Override
     public void warn(String format, Object arg) {
-
+        if (isWarnEnabled()) {
+            Log.w(TAG, String.format(format, arg));
+        }
     }
 
     @Override
     public void warn(String format, Object... arguments) {
-
+        if (isWarnEnabled()) {
+            Log.w(TAG, String.format(format, arguments));
+        }
     }
 
     @Override
     public void warn(String format, Object arg1, Object arg2) {
-
+        if (isWarnEnabled()) {
+            Log.w(TAG, String.format(format, arg1, arg2));
+        }
     }
 
     @Override
@@ -154,17 +160,23 @@ public class ParserLogger implements Logger {
 
     @Override
     public void error(String format, Object arg) {
-
+        if (isErrorEnabled()) {
+            Log.e(TAG, String.format(format, arg));
+        }
     }
 
     @Override
     public void error(String format, Object arg1, Object arg2) {
-
+        if (isErrorEnabled()) {
+            Log.e(TAG, String.format(format, arg1, arg2));
+        }
     }
 
     @Override
     public void error(String format, Object... arguments) {
-
+        if (isErrorEnabled()) {
+            Log.e(TAG, String.format(format, arguments));
+        }
     }
 
     @Override
