@@ -113,22 +113,22 @@ public class XmlParserLogger implements Logger {
 
     @Override
     public void warn(String msg) {
-        Log.d(TAG, msg);
+        Log.w(TAG, msg);
     }
 
     @Override
     public void warn(String format, Object arg) {
-        Log.d(TAG, String.format(format, arg));
+        Log.w(TAG, String.format(format, arg));
     }
 
     @Override
     public void warn(String format, Object... arguments) {
-        Log.d(TAG, String.format(format, arguments));
+        Log.w(TAG, String.format(format, arguments));
     }
 
     @Override
     public void warn(String format, Object arg1, Object arg2) {
-        Log.d(TAG, String.format(format, arg1, arg2));
+        Log.w(TAG, String.format(format, arg1, arg2));
     }
 
     @Override

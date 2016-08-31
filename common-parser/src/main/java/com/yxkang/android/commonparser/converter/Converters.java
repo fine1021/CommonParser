@@ -38,11 +38,11 @@ public final class Converters {
         T rsp = null;
 
         try {
+            String className = clazz.getName();
+            logger.info("convert: class = %s", className);
             int mod = clazz.getModifiers();
-            logger.info("convert: class mod = %d", mod);
+            logger.info("convert: class modifiers = %d", mod);
             if (clazz.getName().contains("$") && !Modifier.isStatic(mod)) {
-                String className = clazz.getName();
-                logger.info("convert: class = %s", className);
                 String outerClass = className.substring(0, className.lastIndexOf("$"));
                 logger.info("convert: outerClass = %s", outerClass);
                 Class<?> cls = Class.forName(outerClass);

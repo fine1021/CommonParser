@@ -56,7 +56,12 @@ public class UserResponse {
                 '}';
     }
 
-    public static class User {
+    public static class User extends _User {
+
+
+    }
+
+    private static class _User {
 
         @MsgItemField
         private String name;
@@ -65,7 +70,7 @@ public class UserResponse {
         @MsgItemField
         private String sex;
 
-        public User() {
+        public _User() {
         }
 
         public String getName() {
@@ -94,7 +99,7 @@ public class UserResponse {
 
         @Override
         public String toString() {
-            return "User {" +
+            return "_User {" +
                     "name='" + name + '\'' +
                     ", age=" + age +
                     ", sex='" + sex + '\'' +
