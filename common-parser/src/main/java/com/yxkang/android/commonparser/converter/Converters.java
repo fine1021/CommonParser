@@ -244,7 +244,7 @@ public final class Converters {
     }
 
     /**
-     * get the public method in the class without throwing an ecception
+     * get the public method in the class without throwing an exception
      *
      * @param clazz      the class
      * @param field      the parameter field
