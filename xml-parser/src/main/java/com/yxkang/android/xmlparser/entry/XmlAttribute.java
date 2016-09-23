@@ -2,8 +2,8 @@ package com.yxkang.android.xmlparser.entry;
 
 /**
  * Created by yexiaokang on 2016/9/22.
- *
- * @see {@link com.yxkang.android.xmlparser.annotation.Attribute}
+ * <p>
+ * same as the {@link com.yxkang.android.xmlparser.annotation.Attribute}
  */
 
 public class XmlAttribute implements Comparable<XmlAttribute> {

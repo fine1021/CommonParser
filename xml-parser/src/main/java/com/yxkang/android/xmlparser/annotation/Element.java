@@ -31,7 +31,7 @@ public @interface Element {
      * the element is an object and has only one item, but the item value is <tt>object.toString()</tt>,
      * so you should tell serializer this tagName. if the item value is an object(such as a custom class),
      * you can set the tagName in you class object annotations, and no need set this.
-     * <br/>
+     * <br>
      * if the element is as followed:
      * <pre>
      *     &lt;data&gt;primitive type value&lt;/data&gt;

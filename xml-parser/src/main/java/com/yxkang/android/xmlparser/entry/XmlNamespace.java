@@ -2,8 +2,8 @@ package com.yxkang.android.xmlparser.entry;
 
 /**
  * Created by yexiaokang on 2016/9/23.
- *
- * @see {@link com.yxkang.android.xmlparser.annotation.Namespace}
+ * <p>
+ * same as the {@link com.yxkang.android.xmlparser.annotation.Namespace}
  */
 
 public class XmlNamespace {
