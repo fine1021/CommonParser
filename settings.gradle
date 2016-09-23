@@ -1,1 +1,1 @@
-include ':app', ':common-parser', ':dom4j'
+include ':app', ':common-parser', ':dom4j', ':xml-parser'

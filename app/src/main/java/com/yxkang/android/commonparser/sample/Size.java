@@ -22,6 +22,7 @@ package com.yxkang.android.commonparser.sample;
  */
 public final class Size {
 
+
     public Size(String string) {
         int sep_ix = string.indexOf('*');
         if (sep_ix < 0) {
