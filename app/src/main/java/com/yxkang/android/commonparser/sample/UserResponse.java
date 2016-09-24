@@ -15,16 +15,16 @@ import java.util.List;
  * Created by yexiaokang on 2016/6/22.
  */
 @Document(name = "root")
-@NamespaceList({@Namespace(namespaceURI = "http://www.w3.org/TR/html4/", prefix = "h"), @Namespace(namespaceURI = "http://www.w3schools.com/furniture", prefix = "f")})
+@NamespaceList({@Namespace(namespaceURI = "http://www.w3.org/TR/html4/", prefix = "p"), @Namespace(namespaceURI = "http://www.w3schools.com/furniture", prefix = "f")})
 public class UserResponse {
 
     @ElementList(name = "users", namespaces = @Namespace(prefix = "p", requiredPrefix = true))
-    @Element(name = "user", namespaces = @Namespace(prefix = "h", requiredPrefix = true))
+    @Element(name = "user")
     @MsgListField(value = "users")
     @MsgItemField(value = "user")
     private List<User> users;
 
-    @ElementList(name = "user", namespaces = @Namespace(prefix = "f", requiredPrefix = true))
+    @ElementList(name = "user")
     @MsgListField(value = "user")
     private List<User> list;
 
@@ -73,6 +73,7 @@ public class UserResponse {
     }
 
 
+    @Namespace(prefix = "f", requiredPrefix = true)
     public static class User extends _User {
 
 
