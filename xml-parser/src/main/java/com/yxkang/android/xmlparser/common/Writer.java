@@ -1,7 +1,5 @@
 package com.yxkang.android.xmlparser.common;
 
-import com.yxkang.android.xmlparser.annotation.Element;
-import com.yxkang.android.xmlparser.annotation.ElementList;
 import com.yxkang.android.xmlparser.entry.XmlElement;
 import com.yxkang.android.xmlparser.exc.XmlSerializeException;
 
@@ -16,30 +14,27 @@ public interface Writer {
     /**
      * write the primitive type value element
      *
-     * @param elementName  the element name
+     * @param xmlElement   the element information, elementName, elementValue, itemName, attributes and namespaces
      * @param elementValue the element value
-     * @param xmlElement   the element information
      */
-    void writePrimitiveElement(String elementName, String elementValue, XmlElement xmlElement);
+    void writePrimitiveElement(XmlElement xmlElement, String elementValue);
 
     /**
      * write the bean element
      *
-     * @param elementName the element name
-     * @param itemName    the element item name, maybe {@code null}, {@link Element#itemName()}
-     * @param bean        the java bean
+     * @param xmlElement the element information, elementName, elementValue, itemName, attributes and namespaces
+     * @param bean       the java bean
      */
-    void writeElement(String elementName, String itemName, Object bean);
+    void writeElement(XmlElement xmlElement, Object bean);
 
     /**
      * write the element list, each item could be a bean or primitive data
      *
-     * @param elementListName the element list name
-     * @param elementName     the element name, maybe {@code null}
-     * @param itemName        the element item name, maybe {@code null}, {@link ElementList#itemName()}
-     * @param list            the list with all beans
-     * @param subType         the bean class type
+     * @param xmlElementList the element list information, elementName, elementValue, itemName, attributes and namespaces
+     * @param xmlElement     the element information, elementName, elementValue, itemName, attributes and namespaces
+     * @param list           the list with all beans
+     * @param subType        the bean class type
      * @throws XmlSerializeException throw when item element is primitive type value, but itemName is empty
      */
-    void writeElementList(String elementListName, String elementName, String itemName, List<?> list, Class<?> subType) throws XmlSerializeException;
+    void writeElementList(XmlElement xmlElementList, XmlElement xmlElement, List<?> list, Class<?> subType) throws XmlSerializeException;
 }

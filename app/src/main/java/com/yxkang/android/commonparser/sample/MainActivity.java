@@ -4,10 +4,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.yxkang.android.xmldom4j.converter.Dom4jConverter;
 import com.yxkang.android.xmlparser.Converter;
 import com.yxkang.android.xmlparser.Serializer;
-import com.yxkang.android.xmlparser.converter.DomConverter;
-import com.yxkang.android.xmlparser.serializer.XmlConstructor;
+import com.yxkang.android.xmlparser.serializer.XmlCommonSerializer;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
                 ListSize listSize = converter.convert(ListSize.class, XmlConstant.DATA3);
                 Log.i(TAG, "xml: " + listSize.toString());*/
-                Converter converter = new DomConverter();
+                Converter converter = new Dom4jConverter();
                 converter.setLogger(new XmlParserTracer());
                 UserResponse userResponse = converter.convert(UserResponse.class, XmlConstant.DATA2);
                 if (userResponse != null) {
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 ListSize listSize = converter.convert(ListSize.class, XmlConstant.DATA3);
                 Log.i(TAG, "xml: " + listSize.toString());
 
-                Serializer serializer = new XmlConstructor();
+                Serializer serializer = new XmlCommonSerializer();
                 serializer.setLogger(new XmlParserTracer());
                 serializer.setCRLF("\n");
                 serializer.setStandalone(null);

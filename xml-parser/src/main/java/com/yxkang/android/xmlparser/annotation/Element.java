@@ -42,4 +42,15 @@ public @interface Element {
      * @return the element object tag name
      */
     String itemName() default "";
+
+    /**
+     * This is used to acquire the namespaces that are declared on
+     * the class. Any number of namespaces can be declared. None of
+     * the declared namespaces will be made the elements namespace,
+     * instead it will simply declare the namespaces so that the
+     * reference URI and prefix will be made available to children.
+     *
+     * @return this returns the namespaces that are declared.
+     */
+    Namespace[] namespaces() default {};
 }

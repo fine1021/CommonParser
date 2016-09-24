@@ -28,11 +28,20 @@ import java.util.List;
  * Created by yexiaokang on 2016/9/22.
  */
 
-final class Serializers {
+@SuppressWarnings("WeakerAccess")
+public final class Serializers {
 
     private static final String XMLNS = "xmlns";
 
-    static void addTag(XmlSerializer xmlSerializer, Serializer serializer, String name, String value) {
+    /**
+     * add a xml tag
+     *
+     * @param xmlSerializer the xmlSerializer
+     * @param serializer    the serializer
+     * @param name          xml tag name
+     * @param value         xml tag value
+     */
+    public static void addTag(XmlSerializer xmlSerializer, Serializer serializer, String name, String value) {
         try {
             xmlSerializer.startTag(null, name);
             if (!TextUtils.isEmpty(value)) {
@@ -49,11 +58,19 @@ final class Serializers {
         }
     }
 
-    static void addTag(XmlSerializer xmlSerializer, Serializer serializer, String name, String value, XmlElement element) {
+    /**
+     * add a xml tag
+     *
+     * @param xmlSerializer the xmlSerializer
+     * @param serializer    the serializer
+     * @param element       the xml element information
+     */
+    public static void addTag(XmlSerializer xmlSerializer, Serializer serializer, XmlElement element) {
         try {
+            String value = element.getElementValue();
             List<XmlAttribute> attributes = element.getAttributes();
             List<XmlNamespace> namespaces = element.getNamespaces();
-            String tagName = getTagName(name, element);
+            String tagName = getTagName(element);
             xmlSerializer.startTag(null, tagName);
             if (attributes != null && !attributes.isEmpty()) {
                 for (XmlAttribute attribute : attributes) {
@@ -83,9 +100,32 @@ final class Serializers {
         }
     }
 
-    static void startTag(XmlSerializer xmlSerializer, Serializer serializer, String name) {
+    /**
+     * start a xml tag
+     *
+     * @param xmlSerializer the xmlSerializer
+     * @param serializer    the serializer
+     * @param element       the xml element information
+     */
+    public static void startTag(XmlSerializer xmlSerializer, Serializer serializer, XmlElement element) {
         try {
-            xmlSerializer.startTag(null, name);
+            List<XmlAttribute> attributes = element.getAttributes();
+            List<XmlNamespace> namespaces = element.getNamespaces();
+            xmlSerializer.startTag(null, getTagName(element));
+            if (attributes != null && !attributes.isEmpty()) {
+                for (XmlAttribute attribute : attributes) {
+                    xmlSerializer.attribute(null, attribute.getName(), attribute.getValue());
+                }
+            }
+            if (namespaces != null && !namespaces.isEmpty()) {
+                for (XmlNamespace namespace : namespaces) {
+                    if (!TextUtils.isEmpty(namespace.getNamespaceURI())) {
+                        String prefix = namespace.getPrefix();
+                        String attributeName = TextUtils.isEmpty(prefix) ? XMLNS : XMLNS + ":" + prefix;
+                        xmlSerializer.attribute(null, attributeName, namespace.getNamespaceURI());
+                    }
+                }
+            }
             if (!TextUtils.isEmpty(serializer.getCRLF())) {
                 xmlSerializer.text(serializer.getCRLF());
             }
@@ -94,7 +134,15 @@ final class Serializers {
         }
     }
 
-    static void startTag(XmlSerializer xmlSerializer, Serializer serializer, String name, XmlElement element) {
+    /**
+     * start a xml tag
+     *
+     * @param xmlSerializer the xmlSerializer
+     * @param serializer    the serializer
+     * @param name          xml tag name
+     * @param element       the xml element information
+     */
+    public static void startTag(XmlSerializer xmlSerializer, Serializer serializer, String name, XmlElement element) {
         try {
             List<XmlAttribute> attributes = element.getAttributes();
             List<XmlNamespace> namespaces = element.getNamespaces();
@@ -121,11 +169,37 @@ final class Serializers {
         }
     }
 
-    static void endTag(XmlSerializer xmlSerializer, Serializer serializer, String name, XmlElement element) {
+    /**
+     * end a xml tag
+     *
+     * @param xmlSerializer the xmlSerializer
+     * @param serializer    the serializer
+     * @param element       the xml element information
+     */
+    public static void endTag(XmlSerializer xmlSerializer, Serializer serializer, XmlElement element) {
+        endTag(xmlSerializer, serializer, getTagName(element));
+    }
+
+    /**
+     * end a xml tag
+     *
+     * @param xmlSerializer the xmlSerializer
+     * @param serializer    the serializer
+     * @param name          xml tag name
+     * @param element       the xml element information
+     */
+    public static void endTag(XmlSerializer xmlSerializer, Serializer serializer, String name, XmlElement element) {
         endTag(xmlSerializer, serializer, getTagName(name, element));
     }
 
-    static void endTag(XmlSerializer xmlSerializer, Serializer serializer, String name) {
+    /**
+     * end a xml tag
+     *
+     * @param xmlSerializer the xmlSerializer
+     * @param serializer    the serializer
+     * @param name          xml tag name
+     */
+    public static void endTag(XmlSerializer xmlSerializer, Serializer serializer, String name) {
         try {
             xmlSerializer.endTag(null, name);
             if (!TextUtils.isEmpty(serializer.getCRLF())) {
@@ -137,7 +211,7 @@ final class Serializers {
     }
 
 
-    static void write(Object bean, Writer writer, Logger logger) {
+    public static void write(Object bean, Writer writer, Logger logger) {
 
         try {
 
@@ -147,9 +221,9 @@ final class Serializers {
             for (FieldDescriptor fieldDescriptor : fieldDescriptors) {
 
                 String elementName = null;
-                String itemName = null;
+                XmlElement xmlElement = null;
                 String elementListName = null;
-                String itemNameList = null;
+                XmlElement xmlElementList = null;
 
                 Field field = fieldDescriptor.getField();
 
@@ -159,27 +233,22 @@ final class Serializers {
 
                     if (Element.class.isAssignableFrom(annotation.annotationType())) {
 
-                        Element element = (Element) annotation;
-                        elementName = element.name();
-                        itemName = element.itemName();
-                        // if the Element annotation value is empty, set the field name as the default value
-                        if (TextUtils.isEmpty(elementName)) {
-                            elementName = fieldDescriptor.getName();
-                        }
+                        xmlElement = SerializerUtils.getElement(field);
+                        elementName = xmlElement.getElementName();
+
                     } else if (ElementList.class.isAssignableFrom(annotation.annotationType())) {
 
-                        ElementList elementList = (ElementList) annotation;
-                        elementListName = elementList.name();
-                        itemNameList = elementList.itemName();
-                        // if the ElementList annotation value is empty, set the field name as the default value
-                        if (TextUtils.isEmpty(elementListName)) {
-                            elementListName = fieldDescriptor.getName();
-                        }
+                        xmlElementList = SerializerUtils.getElementList(field);
+                        elementListName = xmlElementList.getElementName();
                     }
                 }
 
-                if (TextUtils.isEmpty(elementName) && TextUtils.isEmpty(elementListName)) {
+                if (xmlElement == null && xmlElementList == null) {
                     logger.trace("write: this field does't have Element or ElementList annotation, fieldName = %s", fieldDescriptor.getName());
+                    continue;
+                }
+                if (TextUtils.isEmpty(elementName) && TextUtils.isEmpty(elementListName)) {
+                    logger.warn("write: this field has Element or ElementList annotation, but elementName is empty, fieldName = %s", fieldDescriptor.getName());
                     continue;
                 }
 
@@ -191,17 +260,15 @@ final class Serializers {
                 if (TextUtils.isEmpty(elementListName)) {
                     if (ParserUtils.isPrimitiveType(fieldType) || fieldType.isPrimitive()) {
                         Object value = field.get(bean);
-                        // if the field is annotated with Element, try to find Namespace or NamespaceList annotation
-                        XmlElement xmlElement = SerializerUtils.getFieldElement(field);
                         if (value == null) {
-                            writer.writePrimitiveElement(elementName, null, xmlElement);
+                            writer.writePrimitiveElement(xmlElement, null);
                         } else {
-                            writer.writePrimitiveElement(elementName, value.toString(), xmlElement);
+                            writer.writePrimitiveElement(xmlElement, value.toString());
                         }
                     } else {
                         logger.info("write: assume meet a custom class, fieldType = %s", fieldType.getName());
                         Object value = field.get(bean);
-                        writer.writeElement(elementName, itemName, value);
+                        writer.writeElement(xmlElement, value);
                     }
                 } else {
                     if (List.class.isAssignableFrom(fieldType)) {
@@ -214,7 +281,7 @@ final class Serializers {
                                     Class<?> subType = (Class<?>) genericTypes[0];
                                     logger.info("write: subType = %s", subType.getName());
                                     List<?> list = (List<?>) field.get(bean);
-                                    writer.writeElementList(elementListName, elementName, itemNameList, list, subType);
+                                    writer.writeElementList(xmlElementList, xmlElement, list, subType);
                                 }
                             }
                         }
@@ -230,7 +297,34 @@ final class Serializers {
         }
     }
 
+    /**
+     * get the xml tag name
+     *
+     * @param name    xml tag name
+     * @param element the xml element information, include the prefix information
+     * @return the xml tag name
+     */
     private static String getTagName(String name, XmlElement element) {
+        String tagName = name;
+        List<XmlNamespace> namespaces = element.getNamespaces();
+        if (namespaces != null && namespaces.size() == 1) {
+            XmlNamespace xmlNamespace = namespaces.get(0);
+            if (xmlNamespace.isRequiredPrefix()) {
+                String prefix = xmlNamespace.getPrefix();
+                tagName = TextUtils.isEmpty(prefix) ? name : prefix + ":" + name;
+            }
+        }
+        return tagName;
+    }
+
+    /**
+     * get the xml tag name
+     *
+     * @param element the xml element information, include the prefix information
+     * @return the xml tag name
+     */
+    private static String getTagName(XmlElement element) {
+        String name = element.getElementName();
         String tagName = name;
         List<XmlNamespace> namespaces = element.getNamespaces();
         if (namespaces != null && namespaces.size() == 1) {

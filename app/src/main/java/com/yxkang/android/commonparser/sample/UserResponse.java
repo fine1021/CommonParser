@@ -18,22 +18,21 @@ import java.util.List;
 @NamespaceList({@Namespace(namespaceURI = "http://www.w3.org/TR/html4/", prefix = "h"), @Namespace(namespaceURI = "http://www.w3schools.com/furniture", prefix = "f")})
 public class UserResponse {
 
-    @ElementList(name = "users")
-    @Element(name = "user")
+    @ElementList(name = "users", namespaces = @Namespace(prefix = "p", requiredPrefix = true))
+    @Element(name = "user", namespaces = @Namespace(prefix = "h", requiredPrefix = true))
     @MsgListField(value = "users")
     @MsgItemField(value = "user")
     private List<User> users;
 
-    @ElementList(name = "user")
+    @ElementList(name = "user", namespaces = @Namespace(prefix = "f", requiredPrefix = true))
     @MsgListField(value = "user")
     private List<User> list;
 
     @Element(name = "data", itemName = "resolution")
     @MsgItemField(value = "data")
     private Size size;
-
-    @Namespace(prefix = "xsl", requiredPrefix = true)
-    @Element(name = "table")
+    
+    @Element(name = "table", namespaces = {@Namespace(prefix = "xsl", requiredPrefix = true)})
     private String value;
 
     public UserResponse() {
@@ -65,14 +64,15 @@ public class UserResponse {
 
     @Override
     public String toString() {
-        return "UserResponse{" +
+        return "UserResponse {" +
                 "users=" + users +
                 ", list=" + list +
                 ", size=" + size +
+                ", value='" + value + '\'' +
                 '}';
     }
 
-    @Namespace(prefix = "h", requiredPrefix = true)
+
     public static class User extends _User {
 
 

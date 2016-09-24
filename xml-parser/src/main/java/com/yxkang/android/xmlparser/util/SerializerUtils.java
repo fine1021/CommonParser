@@ -3,6 +3,8 @@ package com.yxkang.android.xmlparser.util;
 import android.text.TextUtils;
 
 import com.yxkang.android.xmlparser.annotation.Attribute;
+import com.yxkang.android.xmlparser.annotation.Element;
+import com.yxkang.android.xmlparser.annotation.ElementList;
 import com.yxkang.android.xmlparser.annotation.Namespace;
 import com.yxkang.android.xmlparser.annotation.NamespaceList;
 import com.yxkang.android.xmlparser.entry.XmlAttribute;
@@ -11,7 +13,6 @@ import com.yxkang.android.xmlparser.entry.XmlNamespace;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by yexiaokang on 2016/9/22.
@@ -20,37 +21,89 @@ import java.util.List;
 public class SerializerUtils {
 
     /**
-     * get the field attached xml information, include namespace, attribute
+     * get the field attached xml information, include elementName, elementValue, itemName, attributes and namespaces
      *
      * @param field the field
      * @return the xml element information
      */
-    public static XmlElement getFieldElement(Field field) {
-        XmlElement element = new XmlElement();
-        List<XmlNamespace> xmlNamespaces = new ArrayList<>();
-        Namespace namespace = field.getAnnotation(Namespace.class);
-        if (namespace != null) {
-            XmlNamespace xmlNamespace = new XmlNamespace();
-            xmlNamespace.setNamespaceURI(namespace.namespaceURI());
-            xmlNamespace.setPrefix(namespace.prefix());
-            xmlNamespace.setRequiredPrefix(namespace.requiredPrefix());
-            xmlNamespaces.add(xmlNamespace);
+    public static XmlElement getElement(Field field) {
+        XmlElement xmlElement = new XmlElement();
+        Element element = field.getAnnotation(Element.class);
+        // Note: due to the adjustment before calling this method, the element value is always not null
+        String elementName = element.name();
+        String itemName = element.itemName();
+        // if the Element annotation value is empty, set the field name as the default value
+        if (TextUtils.isEmpty(elementName)) {
+            elementName = field.getName();
         }
-        NamespaceList namespaceList = field.getAnnotation(NamespaceList.class);
-        if (namespaceList != null) {
-            Namespace[] namespaces = namespaceList.value();
-            if (namespaces.length > 0) {
-                for (Namespace ns : namespaces) {
-                    XmlNamespace xmlNamespace = new XmlNamespace();
-                    xmlNamespace.setNamespaceURI(ns.namespaceURI());
-                    xmlNamespace.setPrefix(ns.prefix());
-                    xmlNamespace.setRequiredPrefix(ns.requiredPrefix());
-                    xmlNamespaces.add(xmlNamespace);
-                }
+        xmlElement.setElementName(elementName);
+        xmlElement.setItemName(itemName);
+        Namespace[] namespaces = element.namespaces();
+        if (namespaces.length > 0) {
+            ArrayList<XmlNamespace> xmlNamespaces = new ArrayList<>();
+            for (Namespace ns : namespaces) {
+                XmlNamespace xmlNamespace = new XmlNamespace();
+                xmlNamespace.setNamespaceURI(ns.namespaceURI());
+                xmlNamespace.setPrefix(ns.prefix());
+                xmlNamespace.setRequiredPrefix(ns.requiredPrefix());
+                xmlNamespaces.add(xmlNamespace);
             }
+            xmlElement.setNamespaces(xmlNamespaces);
         }
-        element.setNamespaces(xmlNamespaces);
-        return element;
+        return xmlElement;
+    }
+
+    /**
+     * get the field attached xml list information, include elementName, elementValue, itemName, attributes and namespaces
+     *
+     * @param field the field
+     * @return the xml element information
+     */
+    public static XmlElement getElementList(Field field) {
+        XmlElement xmlElement = new XmlElement();
+        ElementList elementList = field.getAnnotation(ElementList.class);
+        // Note: due to the adjustment before calling this method, the elementList value is always not null
+        String elementListName = elementList.name();
+        String itemNameList = elementList.itemName();
+        // if the ElementList annotation value is empty, set the field name as the default value
+        if (TextUtils.isEmpty(elementListName)) {
+            elementListName = field.getName();
+        }
+        xmlElement.setElementName(elementListName);
+        xmlElement.setItemName(itemNameList);
+        Namespace[] namespaces = elementList.namespaces();
+        if (namespaces.length > 0) {
+            ArrayList<XmlNamespace> xmlNamespaces = new ArrayList<>();
+            for (Namespace ns : namespaces) {
+                XmlNamespace xmlNamespace = new XmlNamespace();
+                xmlNamespace.setNamespaceURI(ns.namespaceURI());
+                xmlNamespace.setPrefix(ns.prefix());
+                xmlNamespace.setRequiredPrefix(ns.requiredPrefix());
+                xmlNamespaces.add(xmlNamespace);
+            }
+            xmlElement.setNamespaces(xmlNamespaces);
+        }
+        return xmlElement;
+    }
+
+    /**
+     * get the bean attached xml information, include elementName, elementValue, itemName, attributes and namespaces
+     *
+     * @param xmlElement the previous element information, used to merge
+     * @param bean       the bean
+     */
+    public static void getBeanElement(XmlElement xmlElement, Object bean) {
+        XmlElement element = getBeanElement(bean);
+        if (xmlElement.getNamespaces() == null) {
+            xmlElement.setNamespaces(element.getNamespaces());
+        } else {
+            xmlElement.getNamespaces().addAll(element.getNamespaces());
+        }
+        if (xmlElement.getAttributes() == null) {
+            xmlElement.setAttributes(element.getAttributes());
+        } else {
+            xmlElement.getAttributes().addAll(element.getAttributes());
+        }
     }
 
     /**
@@ -61,8 +114,8 @@ public class SerializerUtils {
      */
     public static XmlElement getBeanElement(Object bean) {
         XmlElement element = new XmlElement();
-        List<XmlAttribute> xmlAttributes = new ArrayList<>();
-        List<XmlNamespace> xmlNamespaces = new ArrayList<>();
+        ArrayList<XmlAttribute> xmlAttributes = new ArrayList<>();
+        ArrayList<XmlNamespace> xmlNamespaces = new ArrayList<>();
 
         if (bean.getClass().isAnnotationPresent(Namespace.class)) {
             Namespace namespace = bean.getClass().getAnnotation(Namespace.class);

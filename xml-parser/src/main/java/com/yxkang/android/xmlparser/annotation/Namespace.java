@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
  * <pre>xmlns="namespaceURI"</pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = {ElementType.TYPE, ElementType.FIELD})
+@Target(value = {ElementType.TYPE})
 public @interface Namespace {
 
     /**

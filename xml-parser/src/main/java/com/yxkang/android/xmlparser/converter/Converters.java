@@ -23,7 +23,7 @@ import java.util.List;
  * Created by yexiaokang on 2016/6/7.
  * <p>converter utils</p>
  */
-final class Converters {
+public final class Converters {
 
     /**
      * convert the content of the reader to the clazz entry
@@ -34,7 +34,7 @@ final class Converters {
      * @param <T>    data model
      * @return the given clazz entry
      */
-    static <T> T convert(Class<T> clazz, Reader reader, Logger logger) {
+    public static <T> T convert(Class<T> clazz, Reader reader, Logger logger) {
         T rsp = null;
 
         try {

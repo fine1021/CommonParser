@@ -1,0 +1,113 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 24
+        versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+        consumerProguardFiles 'proguard-rules.pro'
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    testCompile 'junit:junit:4.12'
+    compile 'org.dom4j:dom4j:2.0.0'
+    compile project(':xml-parser')
+}
+
+ext {
+    releaseVersion = "${versionMajor}.${versionMinor}.${versionPatch}"
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    baseName = "xml-dom4j"
+    version = project.releaseVersion
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    failOnError false
+    source = android.sourceSets.main.java.sourceFiles
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    baseName = "xml-dom4j"
+    version = project.releaseVersion
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+task buildReleaseJar(dependsOn: ['compileReleaseJavaWithJavac'], type: Jar) {
+
+    // appendix = "demo"
+    baseName = "xml-dom4j"
+    version = project.releaseVersion
+    // classifier = "release"
+
+    // 后缀名
+    extension = "jar"
+    // 最终的 Jar 包名，如果没设置，默认为 [baseName]-[appendix]-[version]-[classifier].[extension]
+    // archiveName = "xml-dom4j.jar"
+
+    // 需打包的资源所在的路径集
+    def srcClassDir = [project.buildDir.absolutePath + "/intermediates/classes/release"];
+    // 初始化资源路径集
+    from srcClassDir
+
+    // 去除路径集下部分的资源
+    exclude "com/yxkang/android/xmldom4j/BuildConfig.class"
+    exclude "**/R.class"
+    exclude "**/R\$*.class"
+
+    // 只导入资源路径集下的部分资源
+    include "com/yxkang/android/xmldom4j/**/*.class"
+
+    // 注: exclude include 支持可变长参数
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+publish {
+    userOrg = 'fine1021'
+    repoName = 'maven'
+    groupId = 'com.yxkang.android'
+    artifactId = 'xml-dom4j'
+    publishVersion = project.releaseVersion
+    description = 'a xml dom4j support plugin for xml parser'
+    website = 'https://github.com/fine1021/CommonParser'
+    issueTracker = "${website}/issues"
+    repository = "${website}.git"
+    bintrayUser = properties.getProperty("bintray.user")
+    bintrayKey = properties.getProperty("bintray.apikey")
+    dryRun = false
+}
