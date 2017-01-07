@@ -24,14 +24,14 @@ import java.util.List;
  * Created by yexiaokang on 2016/9/22.
  */
 
-public class XmlCommonSerializer implements Serializer {
+public class DefaultSerializer implements Serializer {
 
     private String crlf;
     private String encoding = "utf-8";
     private Boolean standalone;
     private Logger logger;
 
-    public XmlCommonSerializer() {
+    public DefaultSerializer() {
         setLogger(new DefaultLogger());
     }
 

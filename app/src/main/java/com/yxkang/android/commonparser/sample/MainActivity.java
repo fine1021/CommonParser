@@ -7,7 +7,7 @@ import android.util.Log;
 import com.yxkang.android.xmldom4j.converter.Dom4jConverter;
 import com.yxkang.android.xmlparser.Converter;
 import com.yxkang.android.xmlparser.Serializer;
-import com.yxkang.android.xmlparser.serializer.XmlCommonSerializer;
+import com.yxkang.android.xmlparser.serializer.DefaultSerializer;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 ListSize listSize = converter.convert(ListSize.class, XmlConstant.DATA3);
                 Log.i(TAG, "xml: " + listSize.toString());
 
-                Serializer serializer = new XmlCommonSerializer();
+                Serializer serializer = new DefaultSerializer();
                 serializer.setLogger(new XmlParserTracer());
                 serializer.setCRLF("\n");
                 serializer.setStandalone(null);
